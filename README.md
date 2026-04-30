@@ -5,6 +5,17 @@ Stream premium video content, host live watch parties, and manage your catalogue
 
 ---
 
+According to this given Project Assignment Context:
+
+This is the flow:
+
+- Docker builds image
+- Docker logs into ECR
+- Docker pushes image
+- Kubernetes (EKS) pulls image
+
+----
+
 ## Step 1: Version Control with Git
 
 ### 🔹 1.1 Fork the Repository
