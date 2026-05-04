@@ -1,22 +1,51 @@
 # StreamingApp Deployment with Kubernetes Orchestration and Auto Scaling
 
-
+## About the Streaming App
 Stream premium video content, host live watch parties, and manage your catalogue with a modern microservice architecture. The platform now ships with a production-ready admin portal, real-time chat, S3-backed adaptive streaming, and a redesigned cinematic frontend experience.
 
 ---
 
-According to this given Project Assignment Context:
+## Assignment Project Overview
 
-This is the flow:
+This project demonstrates a complete end-to-end DevOps pipeline for a MERN (MongoDB, Express, React, Node.js) application, covering:
 
-- Docker builds image
+- Version Control with Git
+- Containerization using Docker
+- CI/CD with Jenkins
+- Deployment on AWS EKS (Kubernetes)
+- Monitoring & Logging with CloudWatch
+- Optional ChatOps Integration
+
+---
+
+## Technology Stack
+
+- Frontend: React
+- Backend: Node.js, Express
+- Database: MongoDB
+- CI/CD: Jenkins
+- Containerization: Docker
+- Container Registry: Amazon ECR
+- Orchestration: Kubernetes (EKS)
+- Monitoring & Logging: AWS CloudWatch
+- Cloud Provider: AWS
+
+---
+
+## Project workflow
+
+**According to this given Project Context**:
+
+This would be the flow of deployment:
+
+- Docker build images
 - Docker logs into ECR
-- Docker pushes image
-- Kubernetes (EKS) pulls image
+- Docker push images
+- Kubernetes (EKS) pull images
 
 ----
 
-## Step 1: Version Control with Git
+## Phase 1: Version Control with Git
 
 ### 🔹 1.1 Fork the Repository
 
@@ -28,7 +57,7 @@ This is the flow:
 ### 🔹 1.2 Clone Fork Locally
 
 ```bash
-git clone https://github.com/<your-username>/StreamingApp.git
+git clone https://github.com/Saima-Devops/StreamingApp.git
 cd StreamingApp
 ```
 
@@ -60,7 +89,7 @@ git push origin main
 ---
 
 
-## Step 2: Prepare & Containerize MERN App
+## Phase 2: Prepare & Containerize MERN App
 
 ### Project Tech Stack:
 
@@ -74,42 +103,185 @@ git push origin main
 
 ---
 
-### 🔹 2.1 Backend Dockerfile
+### 🔹 2.1 Backend Dockerfiles
 
-**Inside /backend:**\
-There must be a Dockerfile for backend container, if not then create. In this assignment the Dockerfile is already provided.
+**Inside /backend:**
+
+- There are 4 microservices:
+   - adminService
+   - authService
+   - chatService
+   - streamingService
+     
+- There must be separate Dockerfiles for each service with correct ports and endpoints.
+
+## Architecture
+
+| Service | Port | Description |
+| --- | --- | --- |
+| `authService` | 3001 | User authentication, registration, JWT issuance |
+| `streamingService` | 3002 | Video catalogue, S3 playback endpoints, public APIs |
+| `adminService` | 3003 | Dedicated admin microservice for asset management and uploads |
+| `chatService` | 3004 | Websocket + REST chat for live watch parties |
+| `frontend` | 3000 | React SPA with revamped UI and integrated chat |
+| `mongo` | 27017 | Shared MongoDB instance |
+
+All backend services share common database models and utilities through `backend/common`.
+
+---
+## 🔹 2.2 Environment Configuration
+
+Created an `.env` for each service. All services accept the standard AWS credentials for S3 access.
+
+### Auth Service (`backend/authService/.env`)
+
+```ini
+PORT=3001
+MONGO_URI=mongodb://localhost:27017/streamingapp
+JWT_SECRET=changeme
+CLIENT_URLS=http://localhost:3000
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=ap-south-1
+AWS_S3_BUCKET=
+```
+
+> I have set up `.env` for each backend microservice, like the above with my configurations & secrets with a specified port.
 
 ---
 
 ### 🔹 2.2 Frontend Dockerfile
 
-**Inside /frontend:**\
-There must be a Dockerfile for frontend container, if not then create. In this assignment the Dockerfile is already provided.
+**Inside /frontend:**
 
+I have created `.env` with the following endpoints:
+
+```ini
+REACT_APP_AUTH_API_URL=http://localhost:3001/api
+REACT_APP_STREAMING_API_URL=http://localhost:3002/api
+REACT_APP_STREAMING_PUBLIC_URL=http://localhost:3002
+REACT_APP_ADMIN_API_URL=http://localhost:3003/api/admin
+REACT_APP_CHAT_API_URL=http://localhost:3004/api/chat
+REACT_APP_CHAT_SOCKET_URL=http://localhost:3004
+```
+
+> Note: In frontend port & endpoints `localhost` can work, but in backend microservices, each should be communicated with the correct api so `localhost` will not work.
 ---
 
 ### 🔹 2.3 Test Locally with Docker
 
 ```bash
-docker build -t streaming-backend ./backend
-docker build -t streaming-frontend ./frontend
-
-docker run -p 5000:5000 streaming-backend
-docker run -p 3000:80 streaming-frontend
+docker-compose up --build
 ```
+
+`docker-compose` will build the images and run all the containers by reading each & every `Dockerfile` inside the app folder
+
 ------
 
-Access the App on port 3000
+**Access the App on port 3000**
 
 ```bash
 http://localhost:3000
 ```
+---
+
+## Troubleshooting:
+
+### Frontend Errors
+
+```
+Browser → F12 key → Console
+```
+
+### Backend Errors
+
+**Check backend logs**
+
+```
+docker-compose logs authservice
+```
+
+Check for:
+
+❌ Mongo connection error\
+❌ Port already in use\
+❌ Missing env variables
+
+---
+
+### Port is already allocated (0.0.0.0:3000)
+
+Solution:
+
+**1. What is using port 3000**
+
+```
+lsof -i :3000
+```
+
+Copy the process id (PID) and kill that process if the process is not necessary.
 
 
+**2. Kill the process**
+
+```
+kill -9 <pid>
+```
+---
+
+### If it's an old container:
+
+```
+docker ps 
+```
+
+- Copy the container id or name
+
+- Stop the container and delete:
+
+```
+docker stop <container_id>
+docker rm <container_id>
+```
+---
+
+Build again after all changes:
+
+```
+docker-compose down
+docker-compose up --build
+```
+
+---
+
+Each Microservice should use the following format to communicate with mongodb, localhost will not work
+
+```
+MONGO_URI=mongodb://mongo:27017/streamingapp
+```
+
+After fixing everything:
+
+- Containers started ✔️
+- Backend connected to Mongo ✔️
+- Frontend loaded properly ✔️
+- APIs responded ✔️
+
+---
+
+## ✅ Expected Results:
+
+
+- Frontend → http://localhost:3000
+- Auth API → http://localhost:3001
+- Streaming API → http://localhost:3002
+
+
+Local Testing Done! 👍
 
 ----
 
-## ☁️ Step 3: Push Images to AWS ECR
+## ☁️ Phase 3: Push Images to AWS ECR
 
 ### 🔹 3.1 Install AWS CLI & Configure
 
@@ -125,39 +297,248 @@ aws configure
 
 -----
 
-### 🔹 3.2 Create ECR Repositories
+### 🔹 3.2 Create AWS ECR Repositories
 
-```bash
-aws ecr create-repository --repository-name streaming-backend
-aws ecr create-repository --repository-name streaming-frontend
+I have written a clean shell script to push ALL services to AWS ECR.
+
+nano `push-to-ecr.sh`
+
+```
+# ===============================
+# 🔹 CONFIG
+# ===============================
+ACCOUNT_ID=123456789012
+REGION=us-east-1
+ECR_BASE=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+
+# ===============================
+# 🔹 LOGIN TO ECR
+# ===============================
+aws ecr get-login-password --region $REGION | \
+docker login --username AWS --password-stdin $ECR_BASE
+
+# ===============================
+# 🔹 CREATE REPOS (safe if already exist)
+# ===============================
+aws ecr create-repository --repository-name frontend || true
+aws ecr create-repository --repository-name authservice || true
+aws ecr create-repository --repository-name adminservice || true
+aws ecr create-repository --repository-name streamingservice || true
+aws ecr create-repository --repository-name chatservice || true
+
+# ===============================
+# 🔹 BUILD, TAG, PUSH
+# ===============================
+
+echo "🚀 Pushing FRONTEND..."
+docker build -t frontend ./frontend
+docker tag frontend:latest $ECR_BASE/frontend:latest
+docker push $ECR_BASE/frontend:latest
+
+echo "🚀 Pushing AUTHSERVICE..."
+docker build -t authservice ./backend/authservice
+docker tag authservice:latest $ECR_BASE/authservice:latest
+docker push $ECR_BASE/authservice:latest
+
+echo "🚀 Pushing ADMINSERVICE..."
+docker build -t adminservice ./backend/adminservice
+docker tag adminservice:latest $ECR_BASE/adminservice:latest
+docker push $ECR_BASE/adminservice:latest
+
+echo "🚀 Pushing STREAMINGSERVICE..."
+docker build -t streamingservice ./backend/streamingservice
+docker tag streamingservice:latest $ECR_BASE/streamingservice:latest
+docker push $ECR_BASE/streamingservice:latest
+
+echo "🚀 Pushing CHATSERVICE..."
+docker build -t chatservice ./backend/chatservice
+docker tag chatservice:latest $ECR_BASE/chatservice:latest
+docker push $ECR_BASE/chatservice:latest
+
+echo "✅ All images pushed successfully!"
 ```
 
-<img width="1487" height="805" alt="ECR-2" src="https://github.com/user-attachments/assets/762f2b14-4379-4b1b-a665-3456215063a5" />
+### Make it executable
+
+```
+chmod +x push-to-ecr.sh
+```
+
+### Run the magic :)
+
+```
+./push-to-ecr.sh
+```
+
+---
+
+### Verification
+
+```
+aws ecr describe-repositories
+aws ecr describe-images --repository-name frontend
+```
+
+---
+
+## Common Pitfalls
+
+❌ AccessDeniedException → IAM user missing ECR permissions\
+❌ no basic auth credentials → forgot login step\
+❌ repository not found → repo name mismatch\
+❌ wrong region → must match exactly
+
+---
+
+## What I have completed till here:
+
+✔ Dockerized app\
+✔ Built images\
+✔ Pushed to Amazon ECR
 
 
-<img width="1907" height="946" alt="image" src="https://github.com/user-attachments/assets/b6c472aa-7f4d-4201-b104-6f67a8de99b7" />
+## 👉 Next step: CI/CD with Jenkins
+
+---
+
+## 🔧 PHASE 4: Jenkins CI/CD
+
+### 🔹 4.1  Install Jenkins on EC2
+
+```
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo apt install jenkins -y
+```
+
+---
+
+### 🔹 4.2 Install Plugins
+
+- Docker Pipeline
+- Git
+- AWS Credentials
+
+-----
+
+### 🔹 4.3 Jenkins Pipeline
+
+```
+
+
+
+
+```
+
+
+
+
+
+
+Now I have to deploy these images on Kubernetes (EKS) using Helm. Let's start!
+
+---
+
+## ☸️ PHASE 5: Deployment on Kubernetes
+
+by **Amazon EKS**
+
+
+### 🔹 5.1 Create cluster
+
+
+
+### 🔹 5.2 Verify
+
+
+
+
+
+### 🔹 5.3 Helm Deployment
+
+
+
+
+
+### 🔹 5.4 Final Deploy
+
+
+
+
+
+---
+
+## 📊 PHASE 6: Monitoring & Logging
+
+by **Amazon CloudWatch**
+
+### Enable logging
+
+- EKS → CloudWatch Logs
+- EC2 → CloudWatch agent
+
 
 ----
 
-### 🔹 3.3 Authenticate Docker to ECR
+### Metrics
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- CPU
+- Memory
+- Pod scaling
 
 ------
+
+## 📚 PHASE 7: Documentation
+
+
+
+
+
+
+
+----
+
+## ☑️ PHASE 8: Validation
+
+
+
+
+
+
+
+----
+
+## 🔔 PHASE 9: ChatOps
+
+by **Amazon SNS (Simple Notification Service)**
+
+Steps:
+- Create SNS Topic
+- Subscribe (Email / Slack Webhook)
+- Trigger from Jenkins:
+
+
+
+
+----
+
+## ⚠️ Reality Check
+
+- Skipping Docker testing locally
+- Wrong ECR tagging
+- Jenkins permission issues
+- EKS IAM misconfig
+- Helm values are misconfigured
+
+
+
+
+
+
+
+
+-----
 
 ## License
 
