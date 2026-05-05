@@ -175,6 +175,14 @@ REACT_APP_CHAT_SOCKET_URL=http://localhost:3004
 docker-compose up --build
 ```
 
+<img width="1280" height="721" alt="Screenshot 2026-05-01 at 1 50 33 AM" src="https://github.com/user-attachments/assets/682f3592-a653-47e5-970b-dd182e76fd7f" />
+
+<br>
+
+<img width="1265" height="706" alt="Screenshot 2026-05-01 at 1 57 48 AM" src="https://github.com/user-attachments/assets/f99c346b-7c1b-47d4-b12e-2c6c15664fa1" />
+
+<br>
+
 `docker-compose` will build the images and run all the containers by reading each & every `Dockerfile` inside the app folder
 
 ------
