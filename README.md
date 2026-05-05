@@ -165,7 +165,8 @@ REACT_APP_CHAT_API_URL=http://localhost:3004/api/chat
 REACT_APP_CHAT_SOCKET_URL=http://localhost:3004
 ```
 
-> Note: In frontend port & endpoints `localhost` can work, but in backend microservices, each should be communicated with the correct api so `localhost` will not work.
+> Note: In frontend `localhost` can work, but in backend microservices, each should be communicated with the correct api so `localhost` will not work.
+
 ---
 
 ### 🔹 2.3 Test Locally with Docker
@@ -183,6 +184,48 @@ docker-compose up --build
 ```bash
 http://localhost:3000
 ```
+
+<img width="1277" height="795" alt="Screenshot 2026-05-01 at 12 03 31 AM" src="https://github.com/user-attachments/assets/d81e8452-b113-4052-a159-e54ddda38a26" />
+
+<br>
+
+<img width="1236" height="458" alt="Screenshot 2026-05-01 at 1 55 10 AM" src="https://github.com/user-attachments/assets/b254c43b-42b0-4e38-8d2e-45ac0c137403" />
+
+----
+
+### Local Development Setup for Testing
+
+Install dependencies for each service:
+
+```
+# auth service
+cd backend/authService && npm install
+
+# streaming service
+cd ../streamingService && npm install
+
+# admin service
+cd ../adminService && npm install
+
+# chat service
+cd ../chatService && npm install
+
+# frontend
+cd ../../frontend && npm install
+
+```
+----
+
+Run the services (in separate terminals) after starting MongoDB:
+
+```
+cd backend/authService && npm run dev
+cd backend/streamingService && npm run dev
+cd backend/adminService && npm run dev
+cd backend/chatService && npm run dev
+cd frontend && npm start
+```
+
 ---
 
 ## Troubleshooting:
