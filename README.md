@@ -201,7 +201,7 @@ http://localhost:3000
 
 ----
 
-### Local Development Setup for Testing
+### Local Development Setup for Testing without Docker
 
 Install dependencies for each service:
 
