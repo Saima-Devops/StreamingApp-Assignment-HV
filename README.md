@@ -330,6 +330,12 @@ After fixing everything:
 
 Local Testing Done! 👍
 
+<img width="1269" height="710" alt="Screenshot 2026-05-06 at 2 36 58 PM" src="https://github.com/user-attachments/assets/2ca883c1-5312-4d9b-a257-b2f6c47e0e43" />
+
+<img width="1257" height="725" alt="Screenshot 2026-05-06 at 2 39 18 PM" src="https://github.com/user-attachments/assets/f119c388-81d6-4df5-af3e-ebe15fb96d85" />
+
+
+
 ----
 
 ## ☁️ Phase 3: Push Images to AWS ECR
