@@ -1,0 +1,128 @@
+global:
+  imageTag: latest
+
+imagePullPolicy: IfNotPresent
+
+clientUrls: "http://localhost:3000"
+
+secrets:
+  existingSecret: ""
+  jwtSecret: "beb55c2b02e916e30a9fe0627b43"
+  externalMongoUri: ""
+  awsAccessKeyId: ""
+  awsSecretAccessKey: ""
+
+aws:
+  region: ap-south-1
+  s3Bucket: "saim-streamingapp-storage"
+  cdnUrl: ""
+
+frontendConfig:
+  authApiUrl: /api/auth
+  streamingApiUrl: /api
+  streamingPublicUrl: /
+  adminApiUrl: /api/admin
+  chatApiUrl: /api/chat
+  chatSocketUrl: /
+
+services:
+  frontend:
+    replicas: 2
+    port: 80
+    image:
+      repository: replace-me/frontend
+      tag: ""
+    healthPath: /
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+  auth:
+    replicas: 2
+    port: 3001
+    image:
+      repository: replace-me/auth
+      tag: ""
+    healthPath: /api/health
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  streaming:
+    replicas: 2
+    port: 3002
+    image:
+      repository: replace-me/streaming
+      tag: ""
+    healthPath: /api/health
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  admin:
+    replicas: 1
+    port: 3003
+    image:
+      repository: replace-me/admin
+      tag: ""
+    healthPath: /api/health
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  chat:
+    replicas: 2
+    port: 3004
+    image:
+      repository: replace-me/chat
+      tag: ""
+    healthPath: /api/health
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+ingress:
+  enabled: true
+  className: alb
+  host: ""
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+
+mongodb:
+  enabled: true
+  image: mongo:6
+  username: admin
+  password: admin123
+  database: streamingapp
+  storageSize: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi

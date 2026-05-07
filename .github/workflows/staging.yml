@@ -1,0 +1,48 @@
+name: Staging CI
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  docker-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify Docker
+        run: docker --version
+
+      - name: Build Frontend
+        run: |
+          docker build -t frontend-test ./frontend
+
+      - name: Build Auth Service
+        run: |
+          docker build -t auth-test \
+          -f backend/authService/Dockerfile \
+          ./backend/authService
+
+      - name: Build Streaming Service
+        run: |
+          docker build -t streaming-test \
+          -f backend/streamingService/Dockerfile \
+          ./backend
+
+      - name: Build Admin Service
+        run: |
+          docker build -t admin-test \
+          -f backend/adminService/Dockerfile \
+          ./backend
+
+      - name: Build Chat Service
+        run: |
+          docker build -t chat-test \
+          -f backend/chatService/Dockerfile \
+          ./backend

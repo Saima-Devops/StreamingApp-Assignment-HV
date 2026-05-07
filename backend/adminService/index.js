@@ -35,6 +35,10 @@ app.get('/api/health', (_, res) => {
   res.json({ success: true, service: 'admin', status: 'ok' });
 });
 
+app.get('/api/admin/health', (_, res) => {
+  res.json({ success: true, service: 'admin', status: 'ok' });
+});
+
 app.use('/api/admin', require('./routes/video.route'));
 
 app.use((err, req, res, next) => {

@@ -6,6 +6,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS configuration
 const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:3000')
   .split(',')
   .map((origin) => origin.trim())
@@ -19,33 +20,34 @@ app.use(cors({
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// Database connection
 require('./util/conn');
 
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ success: true, service: 'auth', status: 'ok' });
+});
+
+app.use('/api/health', require('./routes/healthCheck.route'));
+app.use('/api/auth/health', require('./routes/healthCheck.route'));
+
 // Routes
-const healthCheckRoute = require('./routes/healthCheck.route');
-const userRoute = require('./routes/user.route');
+app.use('/api/auth', require('./routes/user.route'));
 
-app.use('/health', healthCheckRoute);
-app.use('/api', userRoute); // Changed from /apiv1 to /api
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong on the server'
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.originalUrl
   });
 });
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Authentication Service Started at port ${PORT}`);
+  console.log(`Auth Service running on port ${PORT}`);
 });

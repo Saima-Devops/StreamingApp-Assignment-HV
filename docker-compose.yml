@@ -1,23 +1,37 @@
-version: "3.9"
-
 services:
   mongo:
     image: mongo:6
+    container_name: mongo
     restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --username \"$${MONGO_INITDB_ROOT_USERNAME}\" --password \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval \"db.adminCommand('ping')\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   auth:
     build:
       context: ./backend/authService
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
       PORT: 3001
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-streamingapp}
-      JWT_SECRET: ${JWT_SECRET:-changeme}
+      MONGO_URI: mongodb://admin:admin123@mongo:27017/${MONGO_DB:-streamingapp}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-mysecret}
       CLIENT_URLS: ${CLIENT_URLS:-http://localhost:3000}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
@@ -25,17 +39,20 @@ services:
       AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
     ports:
       - "${AUTH_PORT:-3001}:3001"
+    networks:
+      - app-network
 
   streaming:
     build:
       context: ./backend
       dockerfile: streamingService/Dockerfile
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
       PORT: 3002
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-streamingapp}
-      JWT_SECRET: ${JWT_SECRET:-changeme}
+      MONGO_URI: mongodb://admin:admin123@mongo:27017/${MONGO_DB:-streamingapp}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-mysecret}
       CLIENT_URLS: ${CLIENT_URLS:-http://localhost:3000}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
@@ -45,17 +62,20 @@ services:
       STREAMING_PUBLIC_URL: ${STREAMING_PUBLIC_URL:-http://localhost:3002}
     ports:
       - "${STREAMING_PORT:-3002}:3002"
+    networks:
+      - app-network
 
   admin:
     build:
       context: ./backend
       dockerfile: adminService/Dockerfile
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
       PORT: 3003
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-streamingapp}
-      JWT_SECRET: ${JWT_SECRET:-changeme}
+      MONGO_URI: mongodb://admin:admin123@mongo:27017/${MONGO_DB:-streamingapp}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-mysecret}
       CLIENT_URLS: ${CLIENT_URLS:-http://localhost:3000}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
@@ -64,38 +84,49 @@ services:
       AWS_CDN_URL: ${AWS_CDN_URL:-}
     ports:
       - "${ADMIN_PORT:-3003}:3003"
+    networks:
+      - app-network
 
   chat:
     build:
       context: ./backend
       dockerfile: chatService/Dockerfile
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
       PORT: 3004
-      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-streamingapp}
-      JWT_SECRET: ${JWT_SECRET:-changeme}
+      MONGO_URI: mongodb://admin:admin123@mongo:27017/${MONGO_DB:-streamingapp}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-mysecret}
       CLIENT_URLS: ${CLIENT_URLS:-http://localhost:3000}
     ports:
       - "${CHAT_PORT:-3004}:3004"
+    networks:
+      - app-network
 
   frontend:
     build:
       context: ./frontend
-      args:
-        REACT_APP_AUTH_API_URL: ${REACT_APP_AUTH_API_URL:-http://localhost:3001/api}
-        REACT_APP_STREAMING_API_URL: ${REACT_APP_STREAMING_API_URL:-http://localhost:3002/api}
-        REACT_APP_STREAMING_PUBLIC_URL: ${REACT_APP_STREAMING_PUBLIC_URL:-http://localhost:3002}
-        REACT_APP_ADMIN_API_URL: ${REACT_APP_ADMIN_API_URL:-http://localhost:3003/api/admin}
-        REACT_APP_CHAT_API_URL: ${REACT_APP_CHAT_API_URL:-http://localhost:3004/api/chat}
-        REACT_APP_CHAT_SOCKET_URL: ${REACT_APP_CHAT_SOCKET_URL:-http://localhost:3004}
+    environment:
+      REACT_APP_AUTH_API_URL: ${REACT_APP_AUTH_API_URL:-http://localhost:3001/api/auth}
+      REACT_APP_STREAMING_API_URL: ${REACT_APP_STREAMING_API_URL:-http://localhost:3002/api}
+      REACT_APP_STREAMING_PUBLIC_URL: ${REACT_APP_STREAMING_PUBLIC_URL:-http://localhost:3002}
+      REACT_APP_ADMIN_API_URL: ${REACT_APP_ADMIN_API_URL:-http://localhost:3003/api/admin}
+      REACT_APP_CHAT_API_URL: ${REACT_APP_CHAT_API_URL:-http://localhost:3004/api/chat}
+      REACT_APP_CHAT_SOCKET_URL: ${REACT_APP_CHAT_SOCKET_URL:-http://localhost:3004}
     depends_on:
       - auth
       - streaming
       - admin
       - chat
     ports:
-      - "3000:80"
+      - "3005:80"
+    networks:
+      - app-network
 
 volumes:
   mongo-data:
+
+networks:
+  app-network:
+    driver: bridge
