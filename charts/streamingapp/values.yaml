@@ -27,7 +27,7 @@ frontendConfig:
 
 services:
   frontend:
-    replicas: 2
+    replicas: 1
     port: 80
     image:
       repository: replace-me/frontend
@@ -41,7 +41,7 @@ services:
         cpu: 250m
         memory: 256Mi
   auth:
-    replicas: 2
+    replicas: 1
     port: 3001
     image:
       repository: replace-me/auth
@@ -55,7 +55,7 @@ services:
         cpu: 500m
         memory: 512Mi
   streaming:
-    replicas: 2
+    replicas: 1
     port: 3002
     image:
       repository: replace-me/streaming
@@ -83,7 +83,7 @@ services:
         cpu: 500m
         memory: 512Mi
   chat:
-    replicas: 2
+    replicas: 1
     port: 3004
     image:
       repository: replace-me/chat
@@ -108,8 +108,8 @@ ingress:
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 3
+  minReplicas: 1
+  maxReplicas: 2
   targetCPUUtilizationPercentage: 70
 
 mongodb:
