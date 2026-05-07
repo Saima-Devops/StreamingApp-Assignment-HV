@@ -32,18 +32,71 @@ This project demonstrates a complete end-to-end DevOps pipeline for a MERN (Mong
 
 ---
 
-## Project workflow
+## Architecture
 
-**According to this given Project Context**:
+```mermaid
+flowchart LR
+  User["User Browser"] --> ALB["AWS Load Balancer / Ingress"]
+  ALB --> FE["React Frontend (Nginx)"]
+  ALB --> Auth["Auth Service"]
+  ALB --> Stream["Streaming Service"]
+  ALB --> Admin["Admin Service"]
+  ALB --> Chat["Chat Service / Socket.IO"]
 
-This would be the flow of deployment:
+  Auth --> Mongo["MongoDB"]
+  Stream --> Mongo
+  Admin --> Mongo
+  Chat --> Mongo
 
-- Docker build images
-- Docker logs into ECR
-- Docker push images
-- Kubernetes (EKS) pull images
+  Stream --> S3["Amazon S3 / CDN"]
+  Admin --> S3
+
+  Jenkins["Jenkins on EC2"] --> ECR["Amazon ECR"]
+  Jenkins --> EKS["Amazon EKS"]
+  ECR --> EKS
+  EKS --> CloudWatch["CloudWatch Logs and Metrics"]
+  Jenkins --> SNS["SNS Deployment Topic"]
+  SNS --> Slack["Slack via AWS Chatbot / Amazon Q Developer"]
+```
+----
+
+## Routing
+
+The frontend image is built once and configured at runtime through `/env.js`.
+
+In EKS, the ingress routes are:
+
+- `/` -> frontend
+- `/api/auth` -> auth
+- `/api/streaming` -> streaming
+- `/api/admin` -> admin
+- `/api/chat` -> chat
+- `/socket.io` -> chat websocket transport
 
 ----
+
+## Runtime Configuration
+
+Backend configuration is provided by a Helm ConfigMap and Secret. Frontend API URLs are runtime environment variables rendered by Nginx startup:
+
+- `REACT_APP_AUTH_API_URL`
+- `REACT_APP_STREAMING_API_URL`
+- `REACT_APP_STREAMING_PUBLIC_URL`
+- `REACT_APP_ADMIN_API_URL`
+- `REACT_APP_CHAT_API_URL`
+- `REACT_APP_CHAT_SOCKET_URL`
+
+-----
+
+## Scaling
+
+- The Helm chart includes CPU-based `HorizontalPodAutoscalers` for the frontend and app services. 
+- `MongoDB` is deployed as a single `StatefulSet` for assignment/demo use only.
+- Used a managed database for production-grade availability.
+
+----
+
+# Deployment Steps
 
 ## Phase 1: Version Control with Git
 
@@ -103,19 +156,21 @@ git push origin main
 
 ---
 
-### 🔹 2.1 Backend Dockerfiles
+### 🔹 2.1 Dockerfiles
 
 **Inside /backend:**
 
-- There are 4 microservices:
+There are 4 microservices:
    - adminService
    - authService
    - chatService
    - streamingService
      
-- There must be separate Dockerfiles for each service with correct ports and endpoints.
+> There must be separate Dockerfiles for each service with correct ports and endpoints.
 
-## Architecture
+-----
+
+### Micro-Services Ports
 
 | Service | Port | Description |
 | --- | --- | --- |
@@ -126,10 +181,23 @@ git push origin main
 | `frontend` | 3000 | React SPA with revamped UI and integrated chat |
 | `mongo` | 27017 | Shared MongoDB instance |
 
-All backend services share common database models and utilities through `backend/common`.
+> All backend services share common database models and utilities through `backend/common`.
 
----
-## 🔹 2.2 Environment Configuration
+------
+
+### Containerization
+
+The repository contains `Dockerfiles` for all components:
+
+- `frontend/Dockerfile`
+- `backend/authService/Dockerfile`
+- `backend/streamingService/Dockerfile`
+- `backend/adminService/Dockerfile`
+- `backend/chatService/Dockerfile`
+
+------
+
+## 🔹 2.2 Environment Variables Configuration
 
 Created an `.env` for each service. All services accept the standard AWS credentials for S3 access.
 
@@ -146,7 +214,7 @@ AWS_REGION=ap-south-1
 AWS_S3_BUCKET=
 ```
 
-> I have set up `.env` for each backend microservice, like the above with my configurations & secrets with a specified port.
+> I have set up `.env` for each backend microservice, like the above, with my configurations & secrets with a specified port.
 
 ---
 
@@ -187,10 +255,10 @@ docker-compose up --build
 
 ------
 
-**Access the App on port 3000**
+**Access the App on port 3000/3005**
 
 ```bash
-http://localhost:3000
+http://localhost:3000    # I mapped this on port 3005, because port 3000 was busy
 ```
 
 <img width="1277" height="795" alt="Screenshot 2026-05-01 at 12 03 31 AM" src="https://github.com/user-attachments/assets/d81e8452-b113-4052-a159-e54ddda38a26" />
@@ -198,41 +266,13 @@ http://localhost:3000
 <br>
 
 <img width="1236" height="458" alt="Screenshot 2026-05-01 at 1 55 10 AM" src="https://github.com/user-attachments/assets/b254c43b-42b0-4e38-8d2e-45ac0c137403" />
+<br>
 
-----
-
-### Local Development Setup for Testing without Docker
-
-Install dependencies for each service:
-
-```
-# auth service
-cd backend/authService && npm install
-
-# streaming service
-cd ../streamingService && npm install
-
-# admin service
-cd ../adminService && npm install
-
-# chat service
-cd ../chatService && npm install
-
-# frontend
-cd ../../frontend && npm install
-
-```
-----
-
-Run the services (in separate terminals) after starting MongoDB:
-
-```
-cd backend/authService && npm run dev
-cd backend/streamingService && npm run dev
-cd backend/adminService && npm run dev
-cd backend/chatService && npm run dev
-cd frontend && npm start
-```
+<img width="1276" height="658" alt="Screenshot 2026-05-06 at 9 54 51 PM" src="https://github.com/user-attachments/assets/2e08240b-5a90-4ade-b4ba-dd3103e80d32" />
+<br>
+<img width="1265" height="670" alt="Screenshot 2026-05-06 at 9 57 39 PM" src="https://github.com/user-attachments/assets/c2c47198-dbf2-4db6-a3d4-1ec2ee9c8d36" />
+<br>
+<img width="1280" height="656" alt="Screenshot 2026-05-06 at 9 58 06 PM" src="https://github.com/user-attachments/assets/0688a604-39c9-45a4-adf0-c808dda31fbf" />
 
 ---
 
@@ -334,13 +374,16 @@ Local Testing Done! 👍
 
 <img width="1257" height="725" alt="Screenshot 2026-05-06 at 2 39 18 PM" src="https://github.com/user-attachments/assets/f119c388-81d6-4df5-af3e-ebe15fb96d85" />
 
+<br>
+
+**Removed the Resources after local Testing:**
+
+<img width="1078" height="553" alt="Screenshot 2026-05-06 at 10 03 34 PM" src="https://github.com/user-attachments/assets/b7a97f2c-47fd-4567-aada-c008367707dc" />
 
 
 ----
 
-## ☁️ Phase 3: Push Images to AWS ECR
-
-### 🔹 3.1 Install AWS CLI & Configure
+## ☁️ Phase 3: Install AWS CLI & Configure
 
 ```bash
 aws configure
@@ -354,80 +397,132 @@ aws configure
 
 -----
 
-### 🔹 3.2 Create AWS ECR Repositories
+### 🔹 3.1 Build, Tag and push Docker images to ECR using Jenkins jobs
 
-I have written a clean shell script to push ALL services to AWS ECR.
+I have written some clean shell scripts to push ALL services to AWS ECR, which will be executed through Jenkins Jibs.
 
-nano `push-to-ecr.sh`
+- scripts/build-and-push-ecr.sh
+- scripts/create-ecr-repos.sh
+- scripts/deploy-eks.sh
 
-```
-# ===============================
-# 🔹 CONFIG
-# ===============================
-ACCOUNT_ID=123456789012
-REGION=us-east-1
-ECR_BASE=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
-# ===============================
-# 🔹 LOGIN TO ECR
-# ===============================
-aws ecr get-login-password --region $REGION | \
-docker login --username AWS --password-stdin $ECR_BASE
-
-# ===============================
-# 🔹 CREATE REPOS (safe if already exist)
-# ===============================
-aws ecr create-repository --repository-name frontend || true
-aws ecr create-repository --repository-name authservice || true
-aws ecr create-repository --repository-name adminservice || true
-aws ecr create-repository --repository-name streamingservice || true
-aws ecr create-repository --repository-name chatservice || true
-
-# ===============================
-# 🔹 BUILD, TAG, PUSH
-# ===============================
-
-echo "🚀 Pushing FRONTEND..."
-docker build -t frontend ./frontend
-docker tag frontend:latest $ECR_BASE/frontend:latest
-docker push $ECR_BASE/frontend:latest
-
-echo "🚀 Pushing AUTHSERVICE..."
-docker build -t authservice ./backend/authservice
-docker tag authservice:latest $ECR_BASE/authservice:latest
-docker push $ECR_BASE/authservice:latest
-
-echo "🚀 Pushing ADMINSERVICE..."
-docker build -t adminservice ./backend/adminservice
-docker tag adminservice:latest $ECR_BASE/adminservice:latest
-docker push $ECR_BASE/adminservice:latest
-
-echo "🚀 Pushing STREAMINGSERVICE..."
-docker build -t streamingservice ./backend/streamingservice
-docker tag streamingservice:latest $ECR_BASE/streamingservice:latest
-docker push $ECR_BASE/streamingservice:latest
-
-echo "🚀 Pushing CHATSERVICE..."
-docker build -t chatservice ./backend/chatservice
-docker tag chatservice:latest $ECR_BASE/chatservice:latest
-docker push $ECR_BASE/chatservice:latest
-
-echo "✅ All images pushed successfully!"
-```
-
-### Make it executable
+### Make them executable
 
 ```
-chmod +x push-to-ecr.sh
+chmod +x build-and-push-ecr.sh
+chmod +x create-ecr-repos.sh
+chmod +x deploy-eks.sh
 ```
+---
 
-### Run the magic :)
+## 🔧 PHASE 4: Jenkins CI/CD
 
+### 🔹 4.1  Install Jenkins on EC2 or any cloud-based Jenkins
+
+- Install Jenkins on an EC2 instance that has Docker, AWS CLI, kubectl, and Helm installed.
+  
 ```
-./push-to-ecr.sh
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo apt install jenkins -y
 ```
 
 ---
+
+### 🔹 4.2 Install Jenkins Plugins
+
+- Pipeline
+- Git
+- GitHub
+- AWS Credentials
+- Docker Pipeline
+
+**Verify:**
+
+```
+aws --version
+docker --version
+kubectl version --client
+helm version
+eksctl version
+```
+
+-----
+
+### 🔹 4.3 Create Jenkins credentials:
+
+- ID: aws-jenkins
+- Type: AWS credentials
+- Permissions: ECR push, EKS deploy, SNS publish if ChatOps is enabled
+
+-----
+
+### 🔹 4.5 Jenkins Pipeline
+
+- Created a Pipeline job from SCM pointing to the repo "https://github.com/Saima-Devops/StreamingApp-Assignment-HV.git.
+- Jenkinsfile is present on the root.
+- Configured a webhook in your Git repository so new commits trigger builds.
+
+**What does the pipeline do:**
+
+- Checks out code.
+- Logs in to ECR.
+- Creates missing ECR repositories.
+- Builds and pushes all five images.
+- Deploys to EKS from main.
+- Publishes optional SNS success/failure messages if SNS_TOPIC_ARN is set.
+
+------
+
+### 🔹 4.4 Github Webhook
+
+
+
+
+-------
+
+### 🔹 4.5 Create AWS EKS Cluster
+
+**Configure AWS locally:**
+```
+aws configure
+export AWS_REGION=ap-south-1
+export ECR_PREFIX=streamingapp
+```
+
+
+```
+eksctl create cluster \
+  --name streamingapp \
+  --region "$AWS_REGION" \
+  --nodes 1 \
+  --node-type t2.micro \
+  --managed
+```
+
+#### Configure kubectl
+
+```
+aws eks update-kubeconfig --name streamingapp --region "$AWS_REGION"
+kubectl get nodes
+```
+
+**NOTE:** 
+- Install the AWS Load Balancer Controller before using the default ALB ingress class. 
+- Enable metrics-server if HPA scaling is desired.
+
+------
+
+### 🔹 4.6 Build Now:
+
+
+
+
+
+
+
+------
 
 ### Verification
 
@@ -438,7 +533,7 @@ aws ecr describe-images --repository-name frontend
 
 ---
 
-## Common Pitfalls
+### Common Pitfalls
 
 ❌ AccessDeniedException → IAM user missing ECR permissions\
 ❌ no basic auth credentials → forgot login step\
@@ -447,84 +542,50 @@ aws ecr describe-images --repository-name frontend
 
 ---
 
-## What I have completed till here:
-
-✔ Dockerized app\
-✔ Built images\
-✔ Pushed to Amazon ECR
-
-
-## 👉 Next step: CI/CD with Jenkins
-
----
-
-## 🔧 PHASE 4: Jenkins CI/CD
-
-### 🔹 4.1  Install Jenkins on EC2
-
-```
-sudo apt update
-sudo apt install openjdk-17-jdk -y
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-sudo apt install jenkins -y
-```
-
----
-
-### 🔹 4.2 Install Plugins
-
-- Docker Pipeline
-- Git
-- AWS Credentials
-
------
-
-### 🔹 4.3 Jenkins Pipeline
-
-```
-
-
-
-
-```
-
-
-
-
-
-
 Now I have to deploy these images on Kubernetes (EKS) using Helm. Let's start!
 
 ---
 
-## ☸️ PHASE 5: Deployment on Kubernetes
-
-by **Amazon EKS**
+## ☸️ PHASE 5: Deployment on Kubernetes (AWS EKS) with Helm done by Jenkins Job
 
 
-### 🔹 5.1 Create cluster
+### 🔹 5.1 Created & Updated Helm Charts
 
+```
+helm upgrade --install streamingapp charts/streamingapp \
+  --namespace streamingapp \
+  --create-namespace \
+  --set global.imageTag="$IMAGE_TAG" \
+  --set services.frontend.image.repository="$ECR_REGISTRY/streamingapp/frontend" \
+  --set services.auth.image.repository="$ECR_REGISTRY/streamingapp/auth" \
+  --set services.streaming.image.repository="$ECR_REGISTRY/streamingapp/streaming" \
+  --set services.admin.image.repository="$ECR_REGISTRY/streamingapp/admin" \
+  --set services.chat.image.repository="$ECR_REGISTRY/streamingapp/chat" \
+  --set secrets.jwtSecret="replace-with-a-strong-secret" \
+  --set aws.region="$AWS_REGION" \
+  --set aws.s3Bucket="sam-s3-bucket" \
+  --set clientUrls="https://devopsexpert.com"
+```
 
+**Edit if needed:**
 
-### 🔹 5.2 Verify
+- values.yaml
+- deployment.yaml
+- service.yaml
 
+> Check the names of ECR images. Verify all names and values are correct
 
+----
 
+### 🔹 5.2 Check Rollout
 
+```
+kubectl get pods -n streamingapp
+kubectl get ingress -n streamingapp
+kubectl rollout status deployment/streamingapp-streamingapp-frontend -n streamingapp
+```
+-----
 
-### 🔹 5.3 Helm Deployment
-
-
-
-
-
-### 🔹 5.4 Final Deploy
-
-
-
-
-
----
 
 ## 📊 PHASE 6: Monitoring & Logging
 
@@ -532,9 +593,17 @@ by **Amazon CloudWatch**
 
 ### Enable logging
 
+Enable CloudWatch Container Insights or the Amazon CloudWatch Observability add-on for EKS:
+
 - EKS → CloudWatch Logs
 - EC2 → CloudWatch agent
 
+```
+aws eks create-addon \
+  --cluster-name streamingapp \
+  --addon-name amazon-cloudwatch-observability \
+  --region "$AWS_REGION"
+```
 
 ----
 
@@ -544,29 +613,32 @@ by **Amazon CloudWatch**
 - Memory
 - Pod scaling
 
-------
+----
 
-## 📚 PHASE 7: Documentation
+### Recommended alarms:
+
+- ALB target 5xx count > 0 for 5 minutes
+- Pod restart count > 3 in 10 minutes
+- CPU > 70 percent for app deployments
+- Memory > 80 percent for app deployments
+- MongoDB PVC usage > 80 percent if using the demo in-cluster MongoDB
 
 
+### Useful commands:
+```
+kubectl logs -n streamingapp deploy/streamingapp-streamingapp-auth
+kubectl logs -n streamingapp deploy/streamingapp-streamingapp-streaming
+kubectl logs -n streamingapp deploy/streamingapp-streamingapp-admin
+kubectl logs -n streamingapp deploy/streamingapp-streamingapp-chat
+```
 
-
-
+All Jenkins Jobs (CI/CD) are done successfully!!
 
 
 ----
 
-## ☑️ PHASE 8: Validation
 
-
-
-
-
-
-
-----
-
-## 🔔 PHASE 9: ChatOps
+## 🔔 PHASE 7: ChatOps
 
 by **Amazon SNS (Simple Notification Service)**
 
@@ -575,12 +647,78 @@ Steps:
 - Subscribe (Email / Slack Webhook)
 - Trigger from Jenkins:
 
+```
+post {
+    success {
+      sh '''
+        if [ -n "${SNS_TOPIC_ARN:-}" ]; then
+          aws sns publish --topic-arn "$SNS_TOPIC_ARN" --message "Streaming app deployment succeeded: $JOB_NAME #$BUILD_NUMBER ($IMAGE_TAG)"
+        fi
+      '''
+    }
+    failure {
+      sh '''
+        if [ -n "${SNS_TOPIC_ARN:-}" ]; then
+          aws sns publish --topic-arn "$SNS_TOPIC_ARN" --message "Streaming app deployment failed: $JOB_NAME #$BUILD_NUMBER"
+        fi
+      '''
+    }
+```
+
+<br>
+
+**Create an SNS topic:**
+
+```
+aws sns create-topic --name streamingapp-deployments --region "$AWS_REGION"
+```
 
 
+Set `SNS_TOPIC_ARN` in Jenkins. The included `Jenkinsfile` publishes deployment success/failure messages to that topic.
+
+<br>
+
+To send SNS messages to `Slack`, configure `AWS Chatbot` / Amazon Q Developer in chat applications:
+
+---
+
+### Slack Integration
+
+**Steps:**
+
+1. Connect your Slack workspace.
+2. Create a channel configuration.
+3. Attach the `streamingapp-deployments` SNS topic.
+4. Allow the channel role to read CloudWatch/SNS notifications.
 
 ----
 
-## ⚠️ Reality Check
+## ✅ PHASE 8: Final Validation
+
+**After the ALB address is ready:**
+
+```
+APP_URL="http://your-alb-dns-name"
+
+curl "$APP_URL/api/auth/health"
+curl "$APP_URL/api/streaming/health"
+curl "$APP_URL/api/admin/health"
+curl "$APP_URL/api/chat/health"
+curl -I "$APP_URL"
+```
+----
+
+**Also validate in the browser:**
+
+- Register/login works.
+- Browse page loads videos.
+- Admin page can create/list videos.
+- Chat connects on a video page.
+- HPA objects exist with kubectl get hpa -n streamingapp.
+
+----
+
+### ⚠️ Reality Checks for Troubleshooting during the whole process
 
 - Skipping Docker testing locally
 - Wrong ECR tagging
@@ -589,14 +727,19 @@ Steps:
 - Helm values are misconfigured
 
 
-
-
-
-
-
-
 -----
 
 ## License
 
 MIT © StreamFlix Team
+
+-----
+
+## Credits:
+
+**Source Code:** UnpredictablePrashant/StreamingApp
+
+**Demo Deployment:** by **Saima Usman**\
+Student of PPMCAD-15
+
+-----
