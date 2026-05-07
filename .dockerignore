@@ -1,0 +1,9 @@
+**/node_modules
+**/build
+**/coverage
+**/.env
+**/*.log
+.git
+.DS_Store
+frontend/build
+backend/streamingService/controllers/*.mp4

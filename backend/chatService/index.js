@@ -53,6 +53,10 @@ app.get('/api/health', (_, res) => {
   res.json({ success: true, service: 'chat', status: 'ok' });
 });
 
+app.get('/api/chat/health', (_, res) => {
+  res.json({ success: true, service: 'chat', status: 'ok' });
+});
+
 app.use('/api/chat', require('./routes/chat.route'));
 
 io.use((socket, next) => {

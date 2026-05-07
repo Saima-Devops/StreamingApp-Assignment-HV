@@ -10,7 +10,6 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  useTheme,
   Divider,
 } from '@mui/material';
 import {
@@ -28,7 +27,6 @@ const drawerWidth = 240;
 export const AdminDashboard = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentView, setCurrentView] = useState('manage');
-  const theme = useTheme();
   const { logout } = useAuth();
 
   const handleDrawerToggle = () => {

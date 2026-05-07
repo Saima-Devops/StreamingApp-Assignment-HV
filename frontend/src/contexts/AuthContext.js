@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/auth.service';
 import { chatService } from '../services/chat.service';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const handleLogout = useCallback(() => {
+    authService.logout();
+    setUser(null);
+    setToken(null);
+    chatService.disconnect();
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -38,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initAuth();
-  }, []);
+  }, [handleLogout]);
 
   const handleLogin = async (email, password) => {
     try {
@@ -85,14 +93,6 @@ export const AuthProvider = ({ children }) => {
         error: error.response?.data?.message || 'Password reset request failed'
       };
     }
-  };
-
-  const handleLogout = () => {
-    authService.logout();
-    setUser(null);
-    setToken(null);
-    chatService.disconnect();
-    navigate('/login');
   };
 
   const value = {

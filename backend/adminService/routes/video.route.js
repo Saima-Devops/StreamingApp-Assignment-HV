@@ -7,7 +7,7 @@ const controller = require('../controllers/video.controller');
 
 const router = express.Router();
 
-const uploadDir = path.join(process.cwd(), 'tmp-uploads');
+const uploadDir = process.env.UPLOAD_DIR || path.join('/tmp', 'streamingapp-uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
 const upload = multer({ dest: uploadDir });
 
