@@ -4,16 +4,14 @@ metadata:
   name: {{ include "streamingapp.fullname" . }}-config
   labels:
     {{- include "streamingapp.labels" . | nindent 4 }}
+
 data:
-  NODE_ENV: production
+  NODE_ENV: "production"
+
   CLIENT_URLS: {{ .Values.clientUrls | quote }}
+
   AWS_REGION: {{ .Values.aws.region | quote }}
   AWS_S3_BUCKET: {{ .Values.aws.s3Bucket | quote }}
   AWS_CDN_URL: {{ .Values.aws.cdnUrl | quote }}
+
   STREAMING_PUBLIC_URL: {{ .Values.frontendConfig.streamingPublicUrl | quote }}
-  REACT_APP_AUTH_API_URL: {{ .Values.frontendConfig.authApiUrl | quote }}
-  REACT_APP_STREAMING_API_URL: {{ .Values.frontendConfig.streamingApiUrl | quote }}
-  REACT_APP_STREAMING_PUBLIC_URL: {{ .Values.frontendConfig.streamingPublicUrl | quote }}
-  REACT_APP_ADMIN_API_URL: {{ .Values.frontendConfig.adminApiUrl | quote }}
-  REACT_APP_CHAT_API_URL: {{ .Values.frontendConfig.chatApiUrl | quote }}
-  REACT_APP_CHAT_SOCKET_URL: {{ .Values.frontendConfig.chatSocketUrl | quote }}
