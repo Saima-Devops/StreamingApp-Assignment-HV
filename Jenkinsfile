@@ -1,12 +1,9 @@
 pipeline {
   agent any
 
-  options {
-    timestamps()
-    disableConcurrentBuilds()
-  }
-
   environment {
+    PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
     AWS_REGION = 'ap-south-1'
     ECR_PREFIX = 'streamingapp'
     RELEASE_NAME = 'streamingapp'
@@ -14,12 +11,35 @@ pipeline {
     AWS_CREDENTIALS_ID = 'aws-jenkins'
   }
 
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+  }
+
   stages {
+
+    stage('Check Tools') {
+      steps {
+        sh 'echo $PATH'
+        sh 'which aws'
+        sh 'aws --version'
+        sh 'which docker'
+        sh 'docker --version'
+        sh 'which kubectl'
+        sh 'kubectl version --client'
+        sh 'which helm'
+        sh 'helm version'
+      }
+    }
+
     stage('Checkout') {
       steps {
         checkout scm
         script {
-          env.IMAGE_TAG = sh(returnStdout: true, script: 'git rev-parse --short=12 HEAD').trim()
+          env.IMAGE_TAG = sh(
+            returnStdout: true,
+            script: 'git rev-parse --short=12 HEAD'
+          ).trim()
         }
       }
     }
@@ -27,10 +47,22 @@ pipeline {
     stage('AWS Login') {
       steps {
         script {
-          withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: env.AWS_CREDENTIALS_ID]]) {
-            env.AWS_ACCOUNT_ID = sh(returnStdout: true, script: 'aws sts get-caller-identity --query Account --output text').trim()
+          withCredentials([
+            [$class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: env.AWS_CREDENTIALS_ID]
+          ]) {
+
+            env.AWS_ACCOUNT_ID = sh(
+              returnStdout: true,
+              script: 'aws sts get-caller-identity --query Account --output text'
+            ).trim()
+
             env.ECR_REGISTRY = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
-            sh 'aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"'
+
+            sh '''
+              aws ecr get-login-password --region "$AWS_REGION" \
+              | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+            '''
           }
         }
       }
@@ -39,7 +71,11 @@ pipeline {
     stage('Create ECR Repositories') {
       steps {
         script {
-          withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: env.AWS_CREDENTIALS_ID]]) {
+          withCredentials([
+            [$class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: env.AWS_CREDENTIALS_ID]
+          ]) {
+
             sh 'bash scripts/create-ecr-repos.sh'
           }
         }
@@ -49,6 +85,7 @@ pipeline {
     stage('Build and Push Images') {
       steps {
         script {
+
           def services = [
             [name: 'frontend', context: 'frontend', dockerfile: 'Dockerfile'],
             [name: 'auth', context: 'backend/authService', dockerfile: 'Dockerfile'],
@@ -58,8 +95,16 @@ pipeline {
           ]
 
           services.each { svc ->
+
             def image = "${env.ECR_REGISTRY}/${env.ECR_PREFIX}/${svc.name}:${env.IMAGE_TAG}"
-            sh "docker build -t ${image} -f ${svc.context}/${svc.dockerfile} ${svc.context}"
+
+            sh """
+              docker build \
+              -t ${image} \
+              -f ${svc.context}/${svc.dockerfile} \
+              ${svc.context}
+            """
+
             sh "docker push ${image}"
           }
         }
@@ -67,12 +112,19 @@ pipeline {
     }
 
     stage('Deploy to EKS') {
+
       when {
         branch 'main'
       }
+
       steps {
         script {
-          withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: env.AWS_CREDENTIALS_ID]]) {
+
+          withCredentials([
+            [$class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: env.AWS_CREDENTIALS_ID]
+          ]) {
+
             sh '''
               helm upgrade --install "$RELEASE_NAME" charts/streamingapp \
                 --namespace "$K8S_NAMESPACE" \
@@ -91,17 +143,23 @@ pipeline {
   }
 
   post {
+
     success {
       sh '''
         if [ -n "${SNS_TOPIC_ARN:-}" ]; then
-          aws sns publish --topic-arn "$SNS_TOPIC_ARN" --message "Streaming app deployment succeeded: $JOB_NAME #$BUILD_NUMBER ($IMAGE_TAG)"
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --message "Streaming app deployment succeeded: $JOB_NAME #$BUILD_NUMBER ($IMAGE_TAG)"
         fi
       '''
     }
+
     failure {
       sh '''
         if [ -n "${SNS_TOPIC_ARN:-}" ]; then
-          aws sns publish --topic-arn "$SNS_TOPIC_ARN" --message "Streaming app deployment failed: $JOB_NAME #$BUILD_NUMBER"
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --message "Streaming app deployment failed: $JOB_NAME #$BUILD_NUMBER"
         fi
       '''
     }
