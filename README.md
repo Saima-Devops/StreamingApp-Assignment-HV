@@ -218,7 +218,7 @@ AWS_S3_BUCKET=
 
 ---
 
-### 🔹 2.2 Frontend Dockerfile
+### 🔹 2.3 Frontend Dockerfile
 
 **Inside /frontend:**
 
@@ -237,7 +237,7 @@ REACT_APP_CHAT_SOCKET_URL=http://localhost:3004
 
 ---
 
-### 🔹 2.3 Test Locally with Docker
+### 🔹 2.4 Test Locally with Docker
 
 ```bash
 docker-compose up --build
@@ -507,7 +507,7 @@ export ECR_PREFIX=streamingapp
 eksctl create cluster \
   --name streamingapp \
   --region "$AWS_REGION" \
-  --nodes 1 \
+  --nodes 2 \
   --node-type t2.medium \
   --managed
 ```
@@ -574,10 +574,38 @@ Now I have to deploy these images on Kubernetes (EKS) using Helm. Let's start!
 
 ---
 
-## ☸️ PHASE 5: Deployment on Kubernetes (AWS EKS) with Helm done by Jenkins Job
+## ☸️ PHASE 5: Deployment on Kubernetes (AWS EKS) with Helm
+
+### 🔹 5.1 Create an EKS Cluster
+
+```
+eksctl create cluster \
+  --streamingapp \
+  --region ap-south-1 \
+  --nodegroup-name streamingapp \
+  --node-type t2.medium \
+  --nodes 2
+```
 
 
-### 🔹 5.1 Created & Updated Helm Charts
+#### Verify Cluster Access
+
+**Check nodes:**
+
+```
+kubectl get nodes
+```
+
+**This will:**
+
+- Create EKS control plane
+- Create worker nodes
+- Configure networking
+- Update kubeconfig automatically
+
+-----
+
+### 🔹 5.2 Create/Updat Helm Charts
 
 ```
 helm upgrade --install streamingapp charts/streamingapp \
@@ -592,7 +620,7 @@ helm upgrade --install streamingapp charts/streamingapp \
   --set secrets.jwtSecret="replace-with-a-strong-secret" \
   --set aws.region="$AWS_REGION" \
   --set aws.s3Bucket="sam-s3-bucket" \
-  --set clientUrls="https://devopsexpert.com"
+  --set clientUrls=""
 ```
 
 **Edit if needed:**
@@ -602,6 +630,20 @@ helm upgrade --install streamingapp charts/streamingapp \
 - service.yaml
 
 > Check the names of ECR images. Verify all names and values are correct
+
+```
+helm repo update
+kubectl get pods
+```
+<br>
+
+#### Helm does:
+
+- Install the applications on Kubernetes in few commands
+- Manage releases
+- Upgrade/rollback apps
+
+> For the Infrastructure setup automation, we can use `Terraform`
 
 ----
 
@@ -645,7 +687,7 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 ----
 
-### S3 Storage
+### 🔹 5.2 S3 Storage
 
 <img width="1227" height="652" alt="Screenshot 2026-05-10 at 11 45 10 AM" src="https://github.com/user-attachments/assets/262417e0-0650-47f6-a5ef-b9c45d60bd24" />
 
@@ -655,7 +697,7 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 ----
 
-### 🔹 5.2 Check Rollout
+### 🔹 5.3 Check Rollout
 
 ```
 kubectl get pods -n streamingapp
