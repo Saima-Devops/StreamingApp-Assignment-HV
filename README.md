@@ -419,9 +419,6 @@ chmod +x deploy-eks.sh
 #### Every Changes were tested in staging branch before the final deployment
 
 
-<img width="2394" height="1236" alt="image" src="https://github.com/user-attachments/assets/53e7e36e-0e4d-466e-ad7d-57fe3b54e935" />
-
-
 <img width="2560" height="1122" alt="image" src="https://github.com/user-attachments/assets/49cfc414-a837-4b4c-b775-fa06e6a389ad" />
 
 
@@ -430,6 +427,7 @@ chmod +x deploy-eks.sh
 
 <img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/58bdb571-4898-47bb-b148-391df425cbd3" />
 
+<img width="2394" height="1236" alt="image" src="https://github.com/user-attachments/assets/53e7e36e-0e4d-466e-ad7d-57fe3b54e935" />
 
 -----
 
