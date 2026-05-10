@@ -476,7 +476,7 @@ eksctl version
 
 -----
 
-### 🔹 4.5 Jenkins Pipeline
+### 🔹 4.4 Jenkins Pipeline
 
 - Created a Pipeline job from SCM pointing to the repo "https://github.com/Saima-Devops/StreamingApp-Assignment-HV.git.
 - Jenkinsfile is present on the root.
@@ -490,13 +490,6 @@ eksctl version
 - Builds and pushes all five images.
 - Deploys to EKS from main.
 - Publishes optional SNS success/failure messages if SNS_TOPIC_ARN is set.
-
-------
-
-### 🔹 4.4 Github Webhook
-
-
-
 
 -------
 
@@ -535,14 +528,12 @@ kubectl get nodes
 ### 🔹 4.6 Build Now:
 
 
-<img width="2478" height="1400" alt="image" src="https://github.com/user-attachments/assets/b18f6292-686d-4fab-89ee-b2d47111dabe" />
 
 <img width="2438" height="1350" alt="image" src="https://github.com/user-attachments/assets/c98c1221-3305-4826-804f-f06414f23093" />
 
+<img width="2478" height="1400" alt="image" src="https://github.com/user-attachments/assets/b18f6292-686d-4fab-89ee-b2d47111dabe" />
 
-<img width="2540" height="1406" alt="image" src="https://github.com/user-attachments/assets/f49c1298-899d-4dca-9fe1-f0444e55fa1c" />
-
-
+<img width="1246" height="596" alt="Screenshot 2026-05-07 at 4 32 06 PM" src="https://github.com/user-attachments/assets/a468a9f3-3292-4031-91a4-4d7a0b9b6a1f" />
 
 
 
@@ -788,6 +779,10 @@ To send SNS messages to `Slack`, configure `AWS Chatbot` / Amazon Q Developer in
 2. Create a channel configuration.
 3. Attach the `streamingapp-deployments` SNS topic.
 4. Allow the channel role to read CloudWatch/SNS notifications.
+
+<img width="1882" height="606" alt="Screenshot 2026-05-08 225922" src="https://github.com/user-attachments/assets/af77a9f1-3cdd-4d41-bf04-2db8a0472a38" />
+
+<img width="1916" height="868" alt="slack-chatops" src="https://github.com/user-attachments/assets/d408caf8-c826-4714-ab4a-f7d68dd2555c" />
 
 ----
 
