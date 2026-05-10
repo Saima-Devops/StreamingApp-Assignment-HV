@@ -497,7 +497,7 @@ eksctl create cluster \
   --name streamingapp \
   --region "$AWS_REGION" \
   --nodes 1 \
-  --node-type t2.micro \
+  --node-type t2.medium \
   --managed
 ```
 
@@ -576,6 +576,17 @@ helm upgrade --install streamingapp charts/streamingapp \
 > Check the names of ECR images. Verify all names and values are correct
 
 ----
+
+<img width="2480" height="1346" alt="image" src="https://github.com/user-attachments/assets/4711d1a8-36dc-4a21-8cd3-112c8dc77bb4" />
+
+<img width="2472" height="1328" alt="image" src="https://github.com/user-attachments/assets/7555ce6d-699d-4a1d-8e2c-5c1ee85ee71c" />
+
+<img width="2474" height="1348" alt="image" src="https://github.com/user-attachments/assets/71131119-c7ae-4255-a415-272e3928a779" />
+
+<img width="2454" height="1304" alt="image" src="https://github.com/user-attachments/assets/19cf8c46-37f9-4d45-ac16-dab6908c3439" />
+
+
+
 
 ### 🔹 5.2 Check Rollout
 
