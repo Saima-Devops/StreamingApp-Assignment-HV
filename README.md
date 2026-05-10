@@ -657,9 +657,7 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 <img width="1227" height="652" alt="Screenshot 2026-05-10 at 11 45 10 AM" src="https://github.com/user-attachments/assets/262417e0-0650-47f6-a5ef-b9c45d60bd24" />
 
-<img width="1140" height="472" alt="image" src="https://github.com/user-attachments/assets/61e47bc0-ed86-47db-8f9a-739f1349b931" />
-
-<img width="1148" height="260" alt="image" src="https://github.com/user-attachments/assets/ef8ddbc7-4bf5-4ddc-b37b-f846cae08d50" />
+<img width="1192" height="462" alt="image" src="https://github.com/user-attachments/assets/e488f00b-d215-4cfd-8e48-398f101bb3cd" />
 
 <img width="1147" height="523" alt="image" src="https://github.com/user-attachments/assets/4c15c144-3e56-4f1e-88c3-e07232a16d47" />
 
@@ -720,7 +718,10 @@ kubectl logs -n streamingapp deploy/streamingapp-streamingapp-admin
 kubectl logs -n streamingapp deploy/streamingapp-streamingapp-chat
 ```
 
-All Jenkins Jobs (CI/CD) are done successfully!!
+**All Jenkins Jobs (CI/CD) are done successfully!!** 👍
+
+
+<img width="1795" height="440" alt="image" src="https://github.com/user-attachments/assets/a417bafe-aa47-42d3-a8c2-9c88dfee5dc1" />
 
 
 ----
@@ -794,16 +795,6 @@ To send SNS messages to `Slack`, configure `AWS Chatbot` / Amazon Q Developer in
 
 <img width="1795" height="440" alt="image" src="https://github.com/user-attachments/assets/a417bafe-aa47-42d3-a8c2-9c88dfee5dc1" />
 
-
-```
-APP_URL="http://your-alb-dns-name"
-
-curl "$APP_URL/api/auth/health"
-curl "$APP_URL/api/streaming/health"
-curl "$APP_URL/api/admin/health"
-curl "$APP_URL/api/chat/health"
-curl -I "$APP_URL"
-```
 ----
 
 **Also validate in the browser:**
