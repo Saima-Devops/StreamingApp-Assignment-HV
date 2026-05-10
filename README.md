@@ -526,12 +526,6 @@ kubectl get nodes
 ### 🔹 4.6 Jenkins Pipeline (Build Now)
 
 
-<img width="2524" height="446" alt="image" src="https://github.com/user-attachments/assets/8846dba0-563d-458a-b074-0d450fa2f97b" />
-
-
-<img width="1253" height="222" alt="Screenshot 2026-05-09 at 1 27 48 AM" src="https://github.com/user-attachments/assets/37179e48-7fa1-4cab-a5cd-d7b86d098780" />
-
-
 <img width="1270" height="703" alt="Screenshot 2026-05-07 at 2 39 15 PM" src="https://github.com/user-attachments/assets/ec646b3b-3ed5-497f-9c32-fb6f94ad24e5" />
 
 
@@ -600,6 +594,12 @@ kubectl get nodes
 - Create worker nodes
 - Configure networking
 - Update kubeconfig automatically
+
+
+<img width="2524" height="446" alt="image" src="https://github.com/user-attachments/assets/8846dba0-563d-458a-b074-0d450fa2f97b" />
+
+
+<img width="1253" height="222" alt="Screenshot 2026-05-09 at 1 27 48 AM" src="https://github.com/user-attachments/assets/37179e48-7fa1-4cab-a5cd-d7b86d098780" />
 
 -----
 
