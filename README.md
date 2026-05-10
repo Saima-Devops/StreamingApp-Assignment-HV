@@ -525,35 +525,16 @@ kubectl get nodes
 
 ------
 
-### 🔹 4.6 Build Now:
+### 🔹 4.6 Jenkins Pipeline (Build Now)
 
-
-
-<img width="2438" height="1350" alt="image" src="https://github.com/user-attachments/assets/c98c1221-3305-4826-804f-f06414f23093" />
-
-<img width="2478" height="1400" alt="image" src="https://github.com/user-attachments/assets/b18f6292-686d-4fab-89ee-b2d47111dabe" />
-
-<img width="1246" height="596" alt="Screenshot 2026-05-07 at 4 32 06 PM" src="https://github.com/user-attachments/assets/a468a9f3-3292-4031-91a4-4d7a0b9b6a1f" />
-
-
-
-------
-
-### Verification
-
-```
-aws ecr describe-repositories
-aws ecr describe-images --repository-name frontend
-```
-
----
-
-### Screenshots:
 
 <img width="2524" height="446" alt="image" src="https://github.com/user-attachments/assets/8846dba0-563d-458a-b074-0d450fa2f97b" />
 
 
 <img width="1253" height="222" alt="Screenshot 2026-05-09 at 1 27 48 AM" src="https://github.com/user-attachments/assets/37179e48-7fa1-4cab-a5cd-d7b86d098780" />
+
+
+<img width="1270" height="703" alt="Screenshot 2026-05-07 at 2 39 15 PM" src="https://github.com/user-attachments/assets/ec646b3b-3ed5-497f-9c32-fb6f94ad24e5" />
 
 
 <img width="2482" height="964" alt="image" src="https://github.com/user-attachments/assets/c056e924-4716-4b70-81d8-1c20c692c51c" />
@@ -562,19 +543,30 @@ aws ecr describe-images --repository-name frontend
 <img width="2476" height="1212" alt="image" src="https://github.com/user-attachments/assets/a88e5722-1245-4a00-a4bd-0854214eaceb" />
 
 
+<img width="1246" height="596" alt="Screenshot 2026-05-07 at 4 32 06 PM" src="https://github.com/user-attachments/assets/a468a9f3-3292-4031-91a4-4d7a0b9b6a1f" />
+
+------
+
+## 🏆 Finally, the Pipeline has been PASSED
 
 
+After so much **Troubleshooting** got the cleanest CI/CD Pipeline finally:
 
+<br>
 
+<img width="2438" height="1350" alt="image" src="https://github.com/user-attachments/assets/c98c1221-3305-4826-804f-f06414f23093" />
 
-----
+<img width="2478" height="1400" alt="image" src="https://github.com/user-attachments/assets/b18f6292-686d-4fab-89ee-b2d47111dabe" />
+
+------
 
 ### Common Pitfalls
 
 ❌ AccessDeniedException → IAM user missing ECR permissions\
 ❌ no basic auth credentials → forgot login step\
 ❌ repository not found → repo name mismatch\
-❌ wrong region → must match exactly
+❌ Depreciated Versions of dependencies, mismatch with the latest runtime
+
 
 ---
 
