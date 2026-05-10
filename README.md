@@ -617,14 +617,8 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 <img width="2472" height="1328" alt="image" src="https://github.com/user-attachments/assets/7555ce6d-699d-4a1d-8e2c-5c1ee85ee71c" />
 
-<img width="2474" height="1348" alt="image" src="https://github.com/user-attachments/assets/71131119-c7ae-4255-a415-272e3928a779" />
-
-<img width="2454" height="1304" alt="image" src="https://github.com/user-attachments/assets/19cf8c46-37f9-4d45-ac16-dab6908c3439" />
-
-<img width="1227" height="652" alt="Screenshot 2026-05-10 at 11 45 10 AM" src="https://github.com/user-attachments/assets/262417e0-0650-47f6-a5ef-b9c45d60bd24" />
 
 <img width="1240" height="673" alt="Screenshot 2026-05-10 at 11 42 26 AM" src="https://github.com/user-attachments/assets/245eec90-d508-4098-9370-fd1c2fd69da7" />
-
 
 <img width="2560" height="1372" alt="image" src="https://github.com/user-attachments/assets/dca82ceb-3e30-418e-8a4e-bc8ff69fc533" />
 
@@ -657,12 +651,17 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 <img width="2386" height="1026" alt="image" src="https://github.com/user-attachments/assets/529bb95a-de56-4d45-8958-93cbb23b7426" />
 
+----
 
+### S3 Storage
 
+<img width="1227" height="652" alt="Screenshot 2026-05-10 at 11 45 10 AM" src="https://github.com/user-attachments/assets/262417e0-0650-47f6-a5ef-b9c45d60bd24" />
 
+<img width="1140" height="472" alt="image" src="https://github.com/user-attachments/assets/61e47bc0-ed86-47db-8f9a-739f1349b931" />
 
+<img width="1148" height="260" alt="image" src="https://github.com/user-attachments/assets/ef8ddbc7-4bf5-4ddc-b37b-f846cae08d50" />
 
-
+<img width="1147" height="523" alt="image" src="https://github.com/user-attachments/assets/4c15c144-3e56-4f1e-88c3-e07232a16d47" />
 
 ----
 
@@ -782,13 +781,19 @@ To send SNS messages to `Slack`, configure `AWS Chatbot` / Amazon Q Developer in
 
 <img width="1882" height="606" alt="Screenshot 2026-05-08 225922" src="https://github.com/user-attachments/assets/af77a9f1-3cdd-4d41-bf04-2db8a0472a38" />
 
-<img width="1916" height="868" alt="slack-chatops" src="https://github.com/user-attachments/assets/d408caf8-c826-4714-ab4a-f7d68dd2555c" />
+<img width="1918" height="863" alt="SNS-2" src="https://github.com/user-attachments/assets/beba9e09-e255-4685-9f92-52ca460cb5b7" />
+
 
 ----
 
 ## ✅ PHASE 8: Final Validation
 
 **After the ALB address is ready:**
+
+<img width="1610" height="368" alt="image" src="https://github.com/user-attachments/assets/0204948c-aeb2-4749-88e8-3d382899fe8f" />
+
+<img width="1795" height="440" alt="image" src="https://github.com/user-attachments/assets/a417bafe-aa47-42d3-a8c2-9c88dfee5dc1" />
+
 
 ```
 APP_URL="http://your-alb-dns-name"
