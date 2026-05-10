@@ -4,8 +4,8 @@ services:
     container_name: mongo
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_ROOT_USERNAME: admin     #dummy_value
+      MONGO_INITDB_ROOT_PASSWORD: admin123  #dummy_value
     ports:
       - "27017:27017"
     volumes:
