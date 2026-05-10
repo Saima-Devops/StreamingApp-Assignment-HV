@@ -415,6 +415,24 @@ chmod +x deploy-eks.sh
 ```
 ---
 
+
+#### Every Changes were tested in staging branch before the final deployment
+
+
+<img width="2394" height="1236" alt="image" src="https://github.com/user-attachments/assets/53e7e36e-0e4d-466e-ad7d-57fe3b54e935" />
+
+
+<img width="2560" height="1122" alt="image" src="https://github.com/user-attachments/assets/49cfc414-a837-4b4c-b775-fa06e6a389ad" />
+
+
+<img width="1235" height="469" alt="Screenshot 2026-05-07 at 12 34 48 PM" src="https://github.com/user-attachments/assets/bc7a9a69-b296-45e7-af36-35dd52769fd7" />
+
+
+<img width="2560" height="1600" alt="image" src="https://github.com/user-attachments/assets/58bdb571-4898-47bb-b148-391df425cbd3" />
+
+
+-----
+
 ## 🔧 PHASE 4: Jenkins CI/CD
 
 ### 🔹 4.1  Install Jenkins on EC2 or any cloud-based Jenkins
@@ -517,6 +535,12 @@ kubectl get nodes
 ### 🔹 4.6 Build Now:
 
 
+<img width="2478" height="1400" alt="image" src="https://github.com/user-attachments/assets/b18f6292-686d-4fab-89ee-b2d47111dabe" />
+
+<img width="2438" height="1350" alt="image" src="https://github.com/user-attachments/assets/c98c1221-3305-4826-804f-f06414f23093" />
+
+
+<img width="2540" height="1406" alt="image" src="https://github.com/user-attachments/assets/f49c1298-899d-4dca-9fe1-f0444e55fa1c" />
 
 
 
@@ -532,6 +556,27 @@ aws ecr describe-images --repository-name frontend
 ```
 
 ---
+
+### Screenshots:
+
+<img width="2524" height="446" alt="image" src="https://github.com/user-attachments/assets/8846dba0-563d-458a-b074-0d450fa2f97b" />
+
+
+<img width="1253" height="222" alt="Screenshot 2026-05-09 at 1 27 48 AM" src="https://github.com/user-attachments/assets/37179e48-7fa1-4cab-a5cd-d7b86d098780" />
+
+
+<img width="2482" height="964" alt="image" src="https://github.com/user-attachments/assets/c056e924-4716-4b70-81d8-1c20c692c51c" />
+
+
+<img width="2476" height="1212" alt="image" src="https://github.com/user-attachments/assets/a88e5722-1245-4a00-a4bd-0854214eaceb" />
+
+
+
+
+
+
+
+----
 
 ### Common Pitfalls
 
@@ -585,8 +630,50 @@ helm upgrade --install streamingapp charts/streamingapp \
 
 <img width="2454" height="1304" alt="image" src="https://github.com/user-attachments/assets/19cf8c46-37f9-4d45-ac16-dab6908c3439" />
 
+<img width="1227" height="652" alt="Screenshot 2026-05-10 at 11 45 10 AM" src="https://github.com/user-attachments/assets/262417e0-0650-47f6-a5ef-b9c45d60bd24" />
+
+<img width="1240" height="673" alt="Screenshot 2026-05-10 at 11 42 26 AM" src="https://github.com/user-attachments/assets/245eec90-d508-4098-9370-fd1c2fd69da7" />
 
 
+<img width="2560" height="1372" alt="image" src="https://github.com/user-attachments/assets/dca82ceb-3e30-418e-8a4e-bc8ff69fc533" />
+
+<img width="2492" height="1188" alt="image" src="https://github.com/user-attachments/assets/c74f292d-e4fb-464f-acf6-b15869a248be" />
+
+
+<img width="2452" height="1136" alt="image" src="https://github.com/user-attachments/assets/48e4b3e5-73b7-4381-a820-fbb660df192e" />
+
+
+<img width="2464" height="918" alt="image" src="https://github.com/user-attachments/assets/56e78771-29b6-4e89-8d1f-c19f2a3152eb" />
+
+
+
+<img width="2544" height="1364" alt="image" src="https://github.com/user-attachments/assets/e949baff-4d3c-4647-91ed-26bc8abf65d8" />
+
+
+<img width="2548" height="1378" alt="image" src="https://github.com/user-attachments/assets/4f8d5e44-e08a-47d9-9b6b-a00b130473a0" />
+
+
+
+<img width="2550" height="1294" alt="image" src="https://github.com/user-attachments/assets/1647f8b1-727f-47c5-8c03-67fb8a76875f" />
+
+
+<img width="2526" height="1370" alt="image" src="https://github.com/user-attachments/assets/2a67a153-d525-44d6-8862-3a394d7bc182" />
+
+
+
+<img width="2498" height="1364" alt="image" src="https://github.com/user-attachments/assets/b262b910-ad56-4f4b-9ac3-41189d094f8f" />
+
+
+<img width="2386" height="1026" alt="image" src="https://github.com/user-attachments/assets/529bb95a-de56-4d45-8958-93cbb23b7426" />
+
+
+
+
+
+
+
+
+----
 
 ### 🔹 5.2 Check Rollout
 
